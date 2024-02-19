@@ -1,11 +1,10 @@
-import assert from 'assert';
 import {
     charHasUprightVerticalOrientation,
     charAllowsIdeographicBreaking,
     charInComplexShapingScript
 } from '../util/script_detection';
-import verticalizePunctuation from '../util/verticalize_punctuation';
-import {plugin as rtlTextPlugin} from '../source/rtl_text_plugin';
+import {verticalizePunctuation} from '../util/verticalize_punctuation';
+import {rtlWorkerPlugin} from '../source/rtl_text_plugin_worker';
 import ONE_EM from './one_em';
 import {warnOnce} from '../util/util';
 
@@ -14,7 +13,7 @@ import {GLYPH_PBF_BORDER} from '../style/parse_glyph_pbf';
 import type {ImagePosition} from '../render/image_atlas';
 import {IMAGE_PADDING} from '../render/image_atlas';
 import type {Rect, GlyphPosition} from '../render/glyph_atlas';
-import Formatted, {FormattedSection} from '../style-spec/expression/types/formatted';
+import {Formatted, FormattedSection} from '@maplibre/maplibre-gl-style-spec';
 
 enum WritingMode {
     none = 0,
@@ -269,7 +268,7 @@ function shapeText(
 
     let lines: Array<TaggedString>;
 
-    const {processBidirectionalText, processStyledBidirectionalText} = rtlTextPlugin;
+    const {processBidirectionalText, processStyledBidirectionalText} = rtlWorkerPlugin;
     if (processBidirectionalText && logicalInput.sections.length === 1) {
         // Bidi doesn't have to be style-aware
         lines = [];
@@ -340,16 +339,16 @@ const whitespace: {
 const breakable: {
     [_: number]: boolean;
 } = {
-    [0x0a]:   true, // newline
-    [0x20]:   true, // space
-    [0x26]:   true, // ampersand
-    [0x28]:   true, // left parenthesis
-    [0x29]:   true, // right parenthesis
-    [0x2b]:   true, // plus sign
-    [0x2d]:   true, // hyphen-minus
-    [0x2f]:   true, // solidus
-    [0xad]:   true, // soft hyphen
-    [0xb7]:   true, // middle dot
+    [0x0a]: true, // newline
+    [0x20]: true, // space
+    [0x26]: true, // ampersand
+    [0x28]: true, // left parenthesis
+    [0x29]: true, // right parenthesis
+    [0x2b]: true, // plus sign
+    [0x2d]: true, // hyphen-minus
+    [0x2f]: true, // solidus
+    [0xad]: true, // soft hyphen
+    [0xb7]: true, // middle dot
     [0x200b]: true, // zero-width space
     [0x2010]: true, // hyphen
     [0x2013]: true, // en dash
@@ -811,9 +810,6 @@ function fitIconToText(
     iconOffset: [number, number],
     fontScale: number
 ): PositionedIcon {
-    assert(textFit !== 'none');
-    assert(Array.isArray(padding) && padding.length === 4);
-    assert(Array.isArray(iconOffset) && iconOffset.length === 2);
 
     const image = shapedIcon.image;
 

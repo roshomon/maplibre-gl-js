@@ -1,10 +1,10 @@
-import {createMap as globalCreateMap, setPerformance, setWebGlContext} from '../util/test/util';
-import Marker from './marker';
-import Popup from './popup';
-import LngLat from '../geo/lng_lat';
+import {createMap as globalCreateMap, beforeMapTest, sleep} from '../util/test/util';
+import {Marker} from './marker';
+import {Popup} from './popup';
+import {LngLat} from '../geo/lng_lat';
 import Point from '@mapbox/point-geometry';
 import simulate from '../../test/unit/lib/simulate_interaction';
-import type Terrain from '../render/terrain';
+import type {Terrain} from '../render/terrain';
 
 function createMap(options = {}) {
     const container = window.document.createElement('div');
@@ -15,8 +15,7 @@ function createMap(options = {}) {
 }
 
 beforeEach(() => {
-    setWebGlContext();
-    setPerformance();
+    beforeMapTest();
 });
 
 describe('marker', () => {
@@ -86,6 +85,37 @@ describe('marker', () => {
         expect(map.getCanvasContainer().querySelectorAll('.maplibregl-marker')).toHaveLength(1);
 
         map.remove();
+    });
+
+    test('Marker adds classes from className option, methods for class manipulations works properly', () => {
+        const map = createMap();
+        const marker = new Marker({className: 'some classes'})
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        const markerElement = marker.getElement();
+        expect(markerElement.classList.contains('some')).toBeTruthy();
+        expect(markerElement.classList.contains('classes')).toBeTruthy();
+
+        marker.addClassName('addedClass');
+        expect(markerElement.classList.contains('addedClass')).toBeTruthy();
+
+        marker.removeClassName('addedClass');
+        expect(!markerElement.classList.contains('addedClass')).toBeTruthy();
+
+        marker.toggleClassName('toggle');
+        expect(markerElement.classList.contains('toggle')).toBeTruthy();
+
+        marker.toggleClassName('toggle');
+        expect(!markerElement.classList.contains('toggle')).toBeTruthy();
+
+        expect(() => marker.addClassName('should throw exception')).toThrow(window.DOMException);
+        expect(() => marker.removeClassName('should throw exception')).toThrow(window.DOMException);
+        expect(() => marker.toggleClassName('should throw exception')).toThrow(window.DOMException);
+
+        expect(() => marker.addClassName('')).toThrow(window.DOMException);
+        expect(() => marker.removeClassName('')).toThrow(window.DOMException);
+        expect(() => marker.toggleClassName('')).toThrow(window.DOMException);
     });
 
     test('Marker provides LngLat accessors', () => {
@@ -231,17 +261,6 @@ describe('marker', () => {
         expect(marker.getElement().style.transform).toMatch(/translate\(-50%,0\)/);
 
         map.remove();
-    });
-
-    test('Marker accepts backward-compatible constructor parameters', () => {
-        const element = window.document.createElement('div');
-
-        const m1 = new Marker(element);
-        expect(m1.getElement()).toBe(element);
-
-        const m2 = new Marker(element, {offset: [1, 2]});
-        expect(m2.getElement()).toBe(element);
-        expect(m2.getOffset().equals(new Point(1, 2))).toBeTruthy();
     });
 
     test('Popup offsets around default Marker', () => {
@@ -773,23 +792,199 @@ describe('marker', () => {
         map.remove();
     });
 
-    test('Marker removed after update when terrain is on should clear timeout', () => {
+    test('Marker removed after update when terrain is on should clear timeout', async () => {
         jest.spyOn(global, 'setTimeout');
         jest.spyOn(global, 'clearTimeout');
         const map = createMap();
         const marker = new Marker()
             .setLngLat([0, 0])
             .addTo(map);
-        map.style.terrain = {
-            getElevation: () => 0
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: () => .9
         } as any as Terrain;
+        map.transform.lngLatToCameraDepth = () => .95;
 
         marker.setOffset([10, 10]);
+        await sleep(100);
 
         expect(setTimeout).toHaveBeenCalled();
         marker.remove();
         expect(clearTimeout).toHaveBeenCalled();
 
+        map.remove();
+    });
+
+    test('Marker after the terrain event must listen to the render event till is fully loaded', async () => {
+        const map = createMap();
+
+        new Marker()
+            .setLngLat([1, 1])
+            .addTo(map);
+
+        expect(map._oneTimeListeners.render).toBeUndefined();
+
+        map.fire('terrain');
+        expect(map._oneTimeListeners.render).toHaveLength(1);
+
+        map.fire('render');
+        expect(map._oneTimeListeners.render).toHaveLength(1);
+
+        map.fire('render');
+        expect(map._oneTimeListeners.render).toHaveLength(1);
+
+        // await idle to be fully loaded
+        await map.once('idle');
+        map.fire('render');
+        expect(map._oneTimeListeners.render).toHaveLength(0);
+        map.remove();
+    });
+
+    test('Sets default opacity if it\'s not provided as option', async () => {
+        const map = createMap();
+        const marker = new Marker()
+            .setLngLat([0, 0])
+            .addTo(map);
+        await sleep(500);
+        expect(marker.getElement().style.opacity).toMatch('1');
+        map.remove();
+    });
+
+    test('Sets opacity according to options.opacity', async () => {
+        const map = createMap();
+        const marker = new Marker({opacity: '0.7'})
+            .setLngLat([0, 0])
+            .addTo(map);
+        await sleep(500);
+        expect(marker.getElement().style.opacity).toMatch('.7');
+        map.remove();
+    });
+
+    test('Changes opacity to a new value provided by setOpacity', () => {
+        const map = createMap();
+        const marker = new Marker({opacity: '0.7'})
+            .setLngLat([0, 0])
+            .addTo(map);
+        marker.setOpacity('0.6');
+        expect(marker.getElement().style.opacity).toMatch('.6');
+        map.remove();
+    });
+
+    test('Resets opacity to default when setOpacity is called without arguments', () => {
+        const map = createMap();
+        const marker = new Marker({opacity: '0.7'})
+            .setLngLat([0, 0])
+            .addTo(map);
+        marker.setOpacity();
+        expect(marker.getElement().style.opacity).toBe('1');
+        map.remove();
+    });
+
+    test('Marker changes opacity behind terrain and when terrain is removed', async () => {
+        const map = createMap();
+        map.transform.lngLatToCameraDepth = () => .95; // Mocking distance to marker
+        const marker = new Marker()
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        expect(marker.getElement().style.opacity).toMatch('');
+
+        // Add terrain, not blocking marker
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: () => .95 // Mocking distance to terrain
+        } as any as Terrain;
+        await sleep(500);
+        map.fire('terrain');
+
+        expect(marker.getElement().style.opacity).toMatch('1');
+
+        // Terrain blocks marker
+        map.terrain.depthAtPoint = () => .92; // Mocking terrain blocking marker
+        await sleep(500);
+        map.fire('moveend');
+
+        expect(marker.getElement().style.opacity).toMatch('.2');
+
+        // Remove terrain
+        map.terrain = null;
+        await sleep(500);
+        map.fire('terrain');
+        expect(marker.getElement().style.opacity).toMatch('1');
+
+        map.remove();
+    });
+
+    test('Applies options.opacity when 3d terrain is enabled and marker is in clear view', async () => {
+        const map = createMap();
+        map.transform.lngLatToCameraDepth = () => .95; // Mocking distance to marker
+        const marker = new Marker({opacity: '0.7'})
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: () => .95
+        } as any as Terrain;
+        await sleep(500);
+        map.fire('terrain');
+
+        expect(marker.getElement().style.opacity).toMatch('.7');
+        map.remove();
+    });
+
+    test('Applies options.opacity when marker\'s base is hidden by 3d terrain but its center is visible', async () => {
+        const map = createMap();
+        map.transform.lngLatToCameraDepth = () => .95; // Mocking distance to marker
+        const marker = new Marker({opacity: '0.7'})
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: (p) => p.y === 256 ? .95 : .92 // return "far" given the marker's center coord; return "near" otherwise
+        } as any as Terrain;
+        await sleep(500);
+        map.fire('terrain');
+
+        expect(marker.getElement().style.opacity).toMatch('.7');
+        map.remove();
+    });
+
+    test('Applies options.opacityWhenCovered when marker is hidden by 3d terrain', async () => {
+        const map = createMap();
+        map.transform.lngLatToCameraDepth = () => .95; // Mocking distance to marker
+        const marker = new Marker({opacity: '0.7', opacityWhenCovered: '0.3'})
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: () => .92
+        } as any as Terrain;
+        await sleep(500);
+        map.fire('terrain');
+
+        expect(marker.getElement().style.opacity).toMatch('0.3');
+        map.remove();
+    });
+
+    test('Applies new "opacityWhenCovered" provided by setOpacity when marker is hidden by 3d terrain', () => {
+        const map = createMap();
+        map.transform.lngLatToCameraDepth = () => .95; // Mocking distance to marker
+        const marker = new Marker({opacityWhenCovered: '0.15'})
+            .setLngLat([0, 0])
+            .addTo(map);
+
+        map.terrain = {
+            getElevationForLngLatZoom: () => 0,
+            depthAtPoint: () => .92
+        } as any as Terrain;
+        map.fire('terrain');
+
+        marker.setOpacity(undefined, '0.35');
+
+        expect(marker.getElement().style.opacity).toMatch('0.35');
         map.remove();
     });
 });

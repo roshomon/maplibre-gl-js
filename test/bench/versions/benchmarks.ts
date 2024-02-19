@@ -1,6 +1,6 @@
-import maplibregl from '../../../src';
+import * as maplibregl from '../../../src';
 import locationsWithTileID from '../lib/locations_with_tile_id';
-import styleBenchmarkLocations from '@mapbox/gazetteer/benchmark/style-benchmark-locations.json';
+import styleBenchmarkLocations from '../data/style-benchmark-locations.json' assert {type: 'json'};
 import Layout from '../benchmarks/layout';
 import Placement from '../benchmarks/placement';
 import SymbolLayout from '../benchmarks/symbol_layout';
@@ -18,8 +18,10 @@ import QueryBox from '../benchmarks/query_box';
 import {FunctionCreate, FunctionEvaluate, ExpressionCreate, ExpressionEvaluate} from '../benchmarks/expressions';
 import FilterCreate from '../benchmarks/filter_create';
 import FilterEvaluate from '../benchmarks/filter_evaluate';
+import CustomLayer from '../benchmarks/customlayer';
+import MapIdle from '../benchmarks/map_idle';
 
-import getWorkerPool from '../../../src/util/global_worker_pool';
+import {getGlobalWorkerPool} from '../../../src/util/global_worker_pool';
 
 const styleLocations = locationsWithTileID(styleBenchmarkLocations.features  as GeoJSON.Feature<GeoJSON.Point>[]).filter(v => v.zoom < 15); // the used maptiler sources have a maxzoom of 14
 
@@ -70,13 +72,15 @@ register('SymbolLayout', new SymbolLayout(style, styleLocations.map(location => 
 register('FilterCreate', new FilterCreate());
 register('FilterEvaluate', new FilterEvaluate());
 register('HillshadeLoad', new HillshadeLoad());
+register('CustomLayer', new CustomLayer());
+register('MapIdle', new MapIdle());
 
 Promise.resolve().then(() => {
     // Ensure the global worker pool is never drained. Browsers have resource limits
     // on the max number of workers that can be created per page.
     // We do this async to avoid creating workers before the worker bundle blob
     // URL has been set up, which happens after this module is executed.
-    getWorkerPool().acquire(-1);
+    getGlobalWorkerPool().acquire(-1);
 });
 
 export default maplibregl;

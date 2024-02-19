@@ -1,22 +1,21 @@
 import Point from '@mapbox/point-geometry';
-import clipLine from './clip_line';
-import PathInterpolator from './path_interpolator';
+import {clipLine} from './clip_line';
+import {PathInterpolator} from './path_interpolator';
 
 import * as intersectionTests from '../util/intersection_tests';
-import GridIndex from './grid_index';
+import {GridIndex} from './grid_index';
 import {mat4, vec4} from 'gl-matrix';
 import ONE_EM from '../symbol/one_em';
-import assert from 'assert';
 
 import * as projection from '../symbol/projection';
 
-import type Transform from '../geo/transform';
+import type {Transform} from '../geo/transform';
 import type {SingleCollisionBox} from '../data/bucket/symbol_bucket';
 import type {
     GlyphOffsetArray,
     SymbolLineVertexArray
 } from '../data/array_types.g';
-import type {OverlapMode} from '../style/style_layer/symbol_style_layer';
+import type {OverlapMode} from '../style/style_layer/overlap_mode';
 
 // When a symbol crosses the edge that causes it to be included in
 // collision detection, it will cause changes in the symbols around
@@ -34,6 +33,7 @@ export type FeatureKey = {
 };
 
 /**
+ * @internal
  * A collision index used to prevent symbols from overlapping. It keep tracks of
  * where previous symbols have been placed and is used to check if a new
  * symbol overlaps with any previously added symbols.
@@ -42,10 +42,8 @@ export type FeatureKey = {
  * there's room for a symbol, then insertCollisionBox/Circles actually puts the
  * symbol in the index. The two step process allows paired symbols to be inserted
  * together even if they overlap.
- *
- * @private
  */
-class CollisionIndex {
+export class CollisionIndex {
     grid: GridIndex<FeatureKey>;
     ignoredGrid: GridIndex<FeatureKey>;
     transform: Transform;
@@ -141,7 +139,7 @@ class CollisionIndex {
 
         const labelPlaneAnchorPoint = projection.project(tileUnitAnchorPoint, labelPlaneMatrix, getElevation).point;
 
-        const projectionCache = {};
+        const projectionCache = {projections: {}, offsets: {}};
         const lineOffsetX = symbol.lineOffsetX * labelPlaneFontScale;
         const lineOffsetY = symbol.lineOffsetY * labelPlaneFontScale;
 
@@ -181,7 +179,6 @@ class CollisionIndex {
             for (let i = 1; i < last.path.length; i++) {
                 projectedPath.push(last.path[i]);
             }
-            assert(projectedPath.length >= 2);
 
             // Tolerate a slightly longer distance than one diameter between two adjacent circles
             const circleDist = radius * 2.5;
@@ -229,7 +226,6 @@ class CollisionIndex {
 
             for (const seg of segments) {
                 // interpolate positions for collision circles. Add a small padding to both ends of the segment
-                assert(seg.length > 0);
                 interpolator.reset(seg, radius * 0.25);
 
                 let numCircles = 0;
@@ -285,8 +281,6 @@ class CollisionIndex {
      * Because the geometries in the CollisionIndex are an approximation of the shape of
      * symbols on the map, we use the CollisionIndex to look up the symbol part of
      * `queryRenderedFeatures`.
-     *
-     * @private
      */
     queryRenderedSymbols(viewportQueryGeometry: Array<Point>) {
         if (viewportQueryGeometry.length === 0 || (this.grid.keysLength() === 0 && this.ignoredGrid.keysLength() === 0)) {
@@ -364,7 +358,7 @@ class CollisionIndex {
         }
     }
 
-    projectAndGetPerspectiveRatio(posMatrix: mat4, x: number, y: number, getElevation: (x: number, y: number) => number) {
+    projectAndGetPerspectiveRatio(posMatrix: mat4, x: number, y: number, getElevation?: (x: number, y: number) => number) {
         let p;
         if (getElevation) { // slow because of handle z-index
             p = [x, y, getElevation(x, y), 1] as vec4;
@@ -405,5 +399,3 @@ class CollisionIndex {
         return m;
     }
 }
-
-export default CollisionIndex;

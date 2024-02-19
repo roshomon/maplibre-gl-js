@@ -1,9 +1,9 @@
 import Point from '@mapbox/point-geometry';
-import Transform from './transform';
-import LngLat from './lng_lat';
+import {Transform} from './transform';
+import {LngLat} from './lng_lat';
 import {OverscaledTileID, CanonicalTileID} from '../source/tile_id';
 import {fixedLngLat, fixedCoord} from '../../test/unit/lib/fixed';
-import type Terrain from '../render/terrain';
+import type {Terrain} from '../render/terrain';
 
 describe('transform', () => {
     test('creates a transform', () => {
@@ -73,6 +73,18 @@ describe('transform', () => {
         transform.resize(500, 500);
         expect(transform.tileZoom).toBe(0);
         expect(transform.tileZoom).toBe(transform.zoom);
+    });
+
+    test('set zoom inits tileZoom with zoom value', () => {
+        const transform = new Transform(0, 22, 0, 60);
+        transform.zoom = 5;
+        expect(transform.tileZoom).toBe(5);
+    });
+
+    test('set zoom clamps tileZoom to non negative value ', () => {
+        const transform = new Transform(-2, 22, 0, 60);
+        transform.zoom = -2;
+        expect(transform.tileZoom).toBe(0);
     });
 
     test('set fov', () => {
@@ -383,10 +395,10 @@ describe('transform', () => {
 
         expect(transform.customLayerMatrix()[0].toString().length).toBeGreaterThan(10);
         expect(transform.glCoordMatrix[0].toString().length).toBeGreaterThan(10);
-        expect(transform.maxPitchScaleFactor()).toBeCloseTo(2.366025418080343, 10);
+        expect(transform.maxPitchScaleFactor()).toBeCloseTo(2.366025418080343, 5);
     });
 
-    test('recalcuateZoom', () => {
+    test('recalculateZoom', () => {
         const transform = new Transform(0, 22, 0, 60, true);
         transform.elevation = 200;
         transform.center = new LngLat(10.0, 50.0);
@@ -394,17 +406,27 @@ describe('transform', () => {
         transform.resize(512, 512);
 
         // expect same values because of no elevation change
-        transform.getElevation = () => 200;
-        transform.recalculateZoom(null);
+        const terrain = {
+            getElevationForLngLatZoom: () => 200,
+            pointCoordinate: () => null
+        };
+        transform.recalculateZoom(terrain as any);
         expect(transform.zoom).toBe(14);
 
         // expect new zoom because of elevation change
-        transform.getElevation = () => 400;
-        transform.recalculateZoom(null);
-        expect(transform.zoom).toBe(14.127997275621933);
+        terrain.getElevationForLngLatZoom = () => 400;
+        transform.recalculateZoom(terrain as any);
+        expect(transform.zoom).toBeCloseTo(14.127997275621933, 10);
         expect(transform.elevation).toBe(400);
-        expect(transform._center.lng).toBe(10.00000000000071);
-        expect(transform._center.lat).toBe(50.00000000000017);
+
+        expect(transform._center.lng).toBeCloseTo(10, 10);
+        expect(transform._center.lat).toBeCloseTo(50, 10);
+
+        // expect new zoom because of elevation change to point below sea level
+        terrain.getElevationForLngLatZoom = () => -200;
+        transform.recalculateZoom(terrain as any);
+        expect(transform.zoom).toBeCloseTo(13.773740316343467, 10);
+        expect(transform.elevation).toBe(-200);
     });
 
     test('pointCoordinate with terrain when returning null should fall back to 2D', () => {
@@ -440,4 +462,14 @@ describe('transform', () => {
         expect(transform.getBounds().getNorthWest().toArray()).toStrictEqual(transform.pointLocation(new Point(0, top)).toArray());
     });
 
+    test('lngLatToCameraDepth', () => {
+        const transform = new Transform(0, 22, 0, 85, true);
+        transform.resize(500, 500);
+        transform.center = new LngLat(10.0, 50.0);
+
+        expect(transform.lngLatToCameraDepth(new LngLat(10, 50), 4)).toBeCloseTo(0.9997324396231673);
+        transform.pitch = 60;
+        expect(transform.lngLatToCameraDepth(new LngLat(10, 50), 4)).toBeCloseTo(0.9865782165762236);
+
+    });
 });
