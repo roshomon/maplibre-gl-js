@@ -28,9 +28,12 @@
     <script>
         const map = new maplibregl.Map({
             container: 'map',
-            "glyphs": "./glyphs/{fontstack}/{range}.pbf",
+            // "glyphs": "./glyphs/{fontstack}/{range}.pbf",
+            // "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+
             // localIdeographFontFamily: '"Apple LiSung", serif',
             style: {
+                "glyphs": "./glyphs/{fontstack}/{range}.pbf",
                 'version': 8,
                 'sources': {
                     'raster-tiles': {
@@ -123,25 +126,23 @@
                         'line-color': 'grey',
                         'line-width': 2
                     }
+                }, {
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'station_500kV',
+                    'layout': {
+                        'icon-image': '1001',
+                        'icon-allow-overlap': true,
+                        // get the year from the source's "year" property
+                        'text-field': ['get', 'name'],
+                        'text-allow-overlap': true,
+                        'text-font': [
+                            'NotoCJK'
+                        ],
+                        'text-offset': [0, 1.25],
+                        'text-anchor': 'top'
+                    }
                 }
-                    // , {
-                    //     'id': 'points',
-                    //     'type': 'symbol',
-                    //     'source': 'station_500kV',
-                    //     'layout': {
-                    //         'icon-image': '1001',
-                    //         'icon-size': 0.5,
-                    //         // 'text-field': '{name}',
-                    //         // 'text-font': ['StandardFont-Bold'],
-                    //         'text-field': ['get', 'state'],
-                    //         'text-font': [
-                    //             'Open Sans Semibold',
-                    //             'Arial Unicode MS Bold'
-                    //         ],
-                    //         'text-offset': [0, 1.25],
-                    //         'text-anchor': 'top'
-                    //     }
-                    // }
                 ]
             },
             // style:
@@ -169,22 +170,6 @@
         map.on('load', async () => {
             const image = await map.loadImage('./img/1001.png');
             map.addImage('1001', image.data);
-            map.addLayer({
-                'id': 'points',
-                'type': 'symbol',
-                'source': 'station_500kV',
-                'layout': {
-                    'icon-image': 'custom-marker',
-                    // get the year from the source's "year" property
-                    'text-field': ['get', 'name'],
-                    'text-font': [
-                        'Open Sans Semibold'
-                    ],
-                    'text-offset': [0, 1.25],
-                    'text-anchor': 'top'
-                }
-            });
-
         });
     </script>
 </body>

@@ -2,13 +2,108 @@
 
 ### ✨ Features and improvements
 
+- Add events to `GeolocateControl` to allow a more granular interaction ([#3847](https://github.com/maplibre/maplibre-gl-js/pull/3847))
 - _...Add new stuff here..._
+
+### 🐞 Bug fixes
+- _...Add new stuff here..._
+
+## 4.3.2
+
+### 🐞 Bug fixes
+
+- Fix an issue with `moveend` zoom being different than the actual current zoom ([#4132](https://github.com/maplibre/maplibre-gl-js/pull/4132))
+
+## 4.3.1
+
+### 🐞 Bug fixes
+
+- Fix drift in zoom that may happen during flyTo and easeTo due to freezeElevation logic. ([#3878](https://github.com/maplibre/maplibre-gl-js/issues/3878))
+
+## 4.3.0
+
+### ✨ Features and improvements
+
+- Add `getData` method for GeoJSON Sources to provide the possibility to obtain all the source's features ([#4082](https://github.com/maplibre/maplibre-gl-js/pull/4082))
+- Allow cross-fading between raster tile source updates at the same zoom level ([#4072](https://github.com/maplibre/maplibre-gl-js/pull/4072))
+
+### 🐞 Bug fixes
+
+- Fix normalizeSpriteURL before transformRequest throwing an Error with relative URLs ([#3897](https://github.com/maplibre/maplibre-gl-js/issues/3897))
+- Fix return type of map.cameraForBounds ([#3760](https://github.com/maplibre/maplibre-gl-js/issues/3760))
+- Fix to run benchmark with MAPLIBRE_STYLES environment variable ([#2122](https://github.com/maplibre/maplibre-gl-js/issues/2122))
+- Fix symbol collisions using inaccurate and sometimes entirely wrong collision boxes when the map is pitched or rotated ([#210](https://github.com/maplibre/maplibre-gl-js/issues/210))
+- Fix `text-translate` and `icon-translate` behaving weirdly and inconsistently with other `-translate` properties ([#3456](https://github.com/maplibre/maplibre-gl-js/issues/3456))
+- Fix symbol collision debug view (`showCollisionBoxes`) not showing the actual bounding boxes used for collision and click areas. The displayed boxes now match actual collision boxes exactly ([#4071](https://github.com/maplibre/maplibre-gl-js/pull/4071))
+- Fix symbol collision boxes not being accurate for variable-anchor symbols ([#4071](https://github.com/maplibre/maplibre-gl-js/pull/4071))
+- Fix icon collision boxes using `text-translate` property for translation instead of the correct `icon-translate` ([#4071](https://github.com/maplibre/maplibre-gl-js/pull/4071))
+
+## 4.2.0
+
+### ✨ Features and improvements
+
+- Update `Popup`'s methods `addClass` and `removeClass` to return an instance of Popup ([#3975](https://github.com/maplibre/maplibre-gl-js/pull/3975))
+- New map option to decide whether to cancel previous pending tiles while zooming in ([#4051](https://github.com/maplibre/maplibre-gl-js/pull/4051))
+- Sprites include optional textFitHeight and textFitWidth values ([#4019](https://github.com/maplibre/maplibre-gl-js/pull/4019))
+- Add support for `distance` expression ([#4076](https://github.com/maplibre/maplibre-gl-js/pull/4076))
+
+## 4.1.3
+
+### ✨ Features and improvements
+
+- Added const enum for actor messages to improve readability and maintainability. In tsconfig.json, `isolatedModules` flag is set to false in favor of generated JS size. ([#3879](https://github.com/maplibre/maplibre-gl-js/issues/3879))
+
+### 🐞 Bug fixes
+
+- Fix different unwanted panning changes at the end of a panning motion, that happen on a large screen ([#3935](https://github.com/maplibre/maplibre-gl-js/issues/3935))
+- Fix image sources not being marked as loaded on error ([#3981](https://github.com/maplibre/maplibre-gl-js/pull/3981))
+- Fix ScaleControl options should be optional. ([#4002](https://github.com/maplibre/maplibre-gl-js/pull/4002))
+- Fix race condition in `SourceCache` that makes unit tests unstable. Eliminate a redundant 'visibility' event fired from Style class. ([#3992](https://github.com/maplibre/maplibre-gl-js/issues/3992))
+- Fix paint property not being updated by setPaintProperty ([#2651](https://github.com/maplibre/maplibre-gl-js/issues/2651))
+
+## 4.1.2
+
+### ✨ Features and improvements
+
+- Hide Popup when its parent Marker is behind terrain ([#3865](https://github.com/maplibre/maplibre-gl-js/pull/3865))
+
+### 🐞 Bug fixes
+
+- Fix type definition on `localIdeographFontFamily` ([#3896](https://github.com/maplibre/maplibre-gl-js/pull/3896))
+- Fix unwanted panning changes at the end of a panning motion ([#3872](https://github.com/maplibre/maplibre-gl-js/issues/3872))
+- Fix `close` events being fired for popups that aren't open ([#3901](https://github.com/maplibre/maplibre-gl-js/pull/3901))
+
+## 4.1.1
+
+### ✨ Features and improvements
+
+- Improve animation curve when easeTo and flyTo with constraints ([#3793](https://github.com/maplibre/maplibre-gl-js/pull/3793))
+
+### 🐞 Bug fixes
+
+- Fix unwanted zoom changes at the end of a panning motion ([#2094](https://github.com/maplibre/maplibre-gl-js/issues/2094))
+
+## 4.1.0
+
+### ✨ Features and improvements
+
+- Add option to position popup at subpixel coordinates to allow for smooth animations ([#3710](https://github.com/maplibre/maplibre-gl-js/pull/3710))
+- Constrain horizontal panning when renderWorldCopies is set to false ([3738](https://github.com/maplibre/maplibre-gl-js/pull/3738))
+
+### 🐞 Bug fixes
+
+- Fix popup appearing far from marker that was moved to a side globe ([3712](https://github.com/maplibre/maplibre-gl-js/pull/3712))
+- Set text color to ensure contrast in the attribution pill ([3737](https://github.com/maplibre/maplibre-gl-js/pull/3737))
+- Fix memory leak in Worker when map is removed ([3734](https://github.com/maplibre/maplibre-gl-js/pull/3734))
+- Fix issue with `FullscreenControl` when MapLibre is within a [ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot) ([#3573](https://github.com/maplibre/maplibre-gl-js/pull/3573))
+- Fix performance regression with `setRTLTextPlugin` which can cause 1 or 2 extra frames to render. ([#3728](https://github.com/maplibre/maplibre-gl-js/pull/3728))
+
+## 4.0.2
 
 ### 🐞 Bug fixes
 
 - Fix `Style.setState` ignoring validate flag ([#3709](https://github.com/maplibre/maplibre-gl-js/pull/3709))
 - Fix marker flying off near horizon ([3704](https://github.com/maplibre/maplibre-gl-js/pull/3704))
-- _...Add new stuff here..._
 
 ## 4.0.1
 
