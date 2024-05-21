@@ -17,7 +17,8 @@ const defaultOptions = {
     closeOnClick: true,
     focusAfterOpen: true,
     className: '',
-    maxWidth: '240px'
+    maxWidth: '240px',
+    subpixelPositioning: false
 };
 
 /**
@@ -33,6 +34,9 @@ export type Offset = number | PointLike | {
     [_ in PositionAnchor]: PointLike;
 };
 
+/**
+ * The {@link Popup} options object
+ */
 export type PopupOptions = {
     /**
      * If `true`, a close button will appear in the top right corner of the popup.
@@ -78,6 +82,12 @@ export type PopupOptions = {
      * @defaultValue '240px'
      */
     maxWidth?: string;
+    /**
+     * If `true`, rounding is disabled for placement of the popup, allowing for
+     * subpixel positioning and smoother movement when the popup is translated.
+     * @defaultValue false
+     */
+    subpixelPositioning?: boolean;
 };
 
 const focusQuerySelector = [
@@ -102,7 +112,7 @@ const focusQuerySelector = [
  * let popup = new Popup();
  * // Set an event listener that will fire
  * // any time the popup is opened
- * popup.on('open', function(){
+ * popup.on('open', () => {
  *   console.log('popup was opened');
  * });
  * ```
@@ -113,7 +123,7 @@ const focusQuerySelector = [
  * let popup = new Popup();
  * // Set an event listener that will fire
  * // any time the popup is closed
- * popup.on('close', function(){
+ * popup.on('close', () => {
  *   console.log('popup was closed');
  * });
  * ```
@@ -142,11 +152,11 @@ const focusQuerySelector = [
  * @see [Display a popup on click](https://maplibre.org/maplibre-gl-js/docs/examples/popup-on-click/)
  * @see [Attach a popup to a marker instance](https://maplibre.org/maplibre-gl-js/docs/examples/set-popup/)
  *
- * ### Events
+ * ## Events
  *
- * @event `open` Fired when the popup is opened manually or programmatically. `popup` object that was opened
+ * **Event** `open` of type {@link Event} will be fired when the popup is opened manually or programmatically.
  *
- * @event `close` Fired when the popup is closed manually or programmatically. `popup` object that was closed
+ * **Event** `close` of type {@link Event} will be fired when the popup is closed manually or programmatically.
  */
 export class Popup extends Evented {
     _map: Map;
@@ -160,6 +170,9 @@ export class Popup extends Evented {
     _pos: Point;
     _flatPos: Point;
 
+    /**
+     * @param options - the options
+     */
     constructor(options?: PopupOptions) {
         super();
         this.options = extend(Object.create(defaultOptions), options);
@@ -169,7 +182,6 @@ export class Popup extends Evented {
      * Adds the popup to a map.
      *
      * @param map - The MapLibre GL JS map to add the popup to.
-     * @returns `this`
      * @example
      * ```ts
      * new Popup()
@@ -229,7 +241,6 @@ export class Popup extends Evented {
      * let popup = new Popup().addTo(map);
      * popup.remove();
      * ```
-     * @returns `this`
      */
     remove = (): this => {
         if (this._content) {
@@ -251,9 +262,8 @@ export class Popup extends Evented {
             this._map.off('drag', this._onDrag);
             this._map._canvasContainer.classList.remove('maplibregl-track-pointer');
             delete this._map;
+            this.fire(new Event('close'));
         }
-
-        this.fire(new Event('close'));
 
         return this;
     };
@@ -275,11 +285,11 @@ export class Popup extends Evented {
      * Sets the geographical location of the popup's anchor, and moves the popup to it. Replaces trackPointer() behavior.
      *
      * @param lnglat - The geographical location to set as the popup's anchor.
-     * @returns `this`
      */
     setLngLat(lnglat: LngLatLike): this {
         this._lngLat = LngLat.convert(lnglat);
         this._pos = null;
+        this._flatPos = null;
 
         this._trackPointer = false;
 
@@ -307,11 +317,11 @@ export class Popup extends Evented {
      *   .trackPointer()
      *   .addTo(map);
      * ```
-     * @returns `this`
      */
     trackPointer(): this {
         this._trackPointer = true;
         this._pos = null;
+        this._flatPos = null;
         this._update();
         if (this._map) {
             this._map.off('move', this._update);
@@ -353,7 +363,6 @@ export class Popup extends Evented {
      * if the popup content is user-provided.
      *
      * @param text - Textual content for the popup.
-     * @returns `this`
      * @example
      * ```ts
      * let popup = new Popup()
@@ -374,7 +383,6 @@ export class Popup extends Evented {
      * the content is an untrusted text string.
      *
      * @param html - A string representing HTML content for the popup.
-     * @returns `this`
      * @example
      * ```ts
      * let popup = new Popup()
@@ -415,7 +423,6 @@ export class Popup extends Evented {
      * Available values can be found here: https://developer.mozilla.org/en-US/docs/Web/CSS/max-width
      *
      * @param maxWidth - A string representing the value for the maximum width.
-     * @returns `this`
      */
     setMaxWidth(maxWidth: string): this {
         this.options.maxWidth = maxWidth;
@@ -427,7 +434,6 @@ export class Popup extends Evented {
      * Sets the popup's content to the element provided as a DOM node.
      *
      * @param htmlNode - A DOM node to be used as content for the popup.
-     * @returns `this`
      * @example
      * Create an element with the popup content
      * ```ts
@@ -474,6 +480,7 @@ export class Popup extends Evented {
         if (this._container) {
             this._container.classList.add(className);
         }
+        return this;
     }
 
     /**
@@ -491,13 +498,13 @@ export class Popup extends Evented {
         if (this._container) {
             this._container.classList.remove(className);
         }
+        return this;
     }
 
     /**
      * Sets the popup's offset.
      *
      * @param offset - Sets the popup's offset.
-     * @returns `this`
      */
     setOffset (offset?: Offset): this {
         this.options.offset = offset;
@@ -522,6 +529,21 @@ export class Popup extends Evented {
         if (this._container) {
             return this._container.classList.toggle(className);
         }
+    }
+
+    /**
+     * Set the option to allow subpixel positioning of the popup by passing a boolean
+     *
+     * @param value - When boolean is true, subpixel positioning is enabled for the popup.
+     *
+     * @example
+     * ```ts
+     * let popup = new Popup()
+     * popup.setSubpixelPositioning(true);
+     * ```
+     */
+    setSubpixelPositioning(value: boolean) {
+        this.options.subpixelPositioning = value;
     }
 
     _createCloseButton() {
@@ -572,6 +594,8 @@ export class Popup extends Evented {
 
         if (this._map.transform.renderWorldCopies && !this._trackPointer) {
             this._lngLat = smartWrap(this._lngLat, this._flatPos, this._map.transform);
+        } else {
+            this._lngLat = this._lngLat?.wrap();
         }
 
         if (this._trackPointer && !cursor) return;
@@ -611,7 +635,12 @@ export class Popup extends Evented {
             }
         }
 
-        const offsetedPos = pos.add(offset[anchor]).round();
+        let offsetedPos = pos.add(offset[anchor]);
+
+        if (!this.options.subpixelPositioning) {
+            offsetedPos = offsetedPos.round();
+        }
+
         DOM.setTransform(this._container, `${anchorTranslate[anchor]} translate(${offsetedPos.x}px,${offsetedPos.y}px)`);
         applyAnchorClass(this._container, anchor, 'popup');
     };

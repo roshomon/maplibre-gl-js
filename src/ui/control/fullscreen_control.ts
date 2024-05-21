@@ -31,11 +31,11 @@ type FullscreenControlOptions = {
  * ```
  * @see [View a fullscreen map](https://maplibre.org/maplibre-gl-js/docs/examples/fullscreen/)
  *
- * ### Events
+ * ## Events
  *
- * @event `fullscreenstart` - Fired when fullscreen mode has started
+ * **Event** `fullscreenstart` of type {@link Event} will be fired when fullscreen mode has started.
  *
- * @event `fullscreenend` - Fired when fullscreen mode has ended
+ * **Event** `fullscreenend` of type {@link Event} will be fired when fullscreen mode has ended.
  */
 export class FullscreenControl extends Evented implements IControl {
     _map: Map;
@@ -109,11 +109,15 @@ export class FullscreenControl extends Evented implements IControl {
     }
 
     _onFullscreenChange = () => {
-        const fullscreenElement =
+        let fullscreenElement =
             window.document.fullscreenElement ||
             (window.document as any).mozFullScreenElement ||
             (window.document as any).webkitFullscreenElement ||
             (window.document as any).msFullscreenElement;
+
+        while (fullscreenElement?.shadowRoot?.fullscreenElement) {
+            fullscreenElement = fullscreenElement.shadowRoot.fullscreenElement;
+        }
 
         if ((fullscreenElement === this._container) !== this._fullscreen) {
             this._handleFullscreenChange();

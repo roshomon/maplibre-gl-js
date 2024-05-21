@@ -13,6 +13,9 @@ import type {AddressInfo} from 'node:net';
 import {localizeURLs} from '../lib/localize-urls';
 import {globSync} from 'glob';
 
+import * as maplibreglModule from '../../../dist/maplibre-gl';
+let maplibregl: typeof maplibreglModule;
+
 jest.retryTimes(3);
 
 function performQueryOnFixture(fixture)  {
@@ -35,7 +38,7 @@ function performQueryOnFixture(fixture)  {
 
         const operationHandlers = {
             wait(map, params, done) {
-                const wait = function() {
+                const wait = () => {
                     if (map.loaded()) {
                         done();
                     } else {
@@ -45,7 +48,7 @@ function performQueryOnFixture(fixture)  {
                 wait();
             },
             idle(map, params, done) {
-                const idle = function() {
+                const idle = () => {
                     if (!map.isMoving()) {
                         done();
                     } else {
@@ -80,18 +83,13 @@ function performQueryOnFixture(fixture)  {
         const options = style.metadata.test;
         const skipLayerDelete = style.metadata.skipLayerDelete;
 
-        // @ts-ignore
         const map =  new maplibregl.Map({
             container: 'map',
             style,
-            // @ts-ignore
-            classes: options.classes,
             interactive: false,
             attributionControl: false,
             pixelRatio: options.pixelRatio,
             preserveDrawingBuffer: true,
-            axonometric: options.axonometric || false,
-            skew: options.skew || [0, 0],
             fadeDuration: options.fadeDuration || 0,
             localIdeographFontFamily: options.localIdeographFontFamily || false,
             crossSourceCollisions: typeof options.crossSourceCollisions === 'undefined' ? true : options.crossSourceCollisions
