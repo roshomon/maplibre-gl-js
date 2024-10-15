@@ -11,7 +11,7 @@ import puppeteer, {Page, Browser} from 'puppeteer';
 import {CoverageReport} from 'monocart-coverage-reports';
 import {localizeURLs} from '../lib/localize-urls';
 import type {Map, CanvasSource, PointLike, StyleSpecification} from '../../../dist/maplibre-gl';
-import jnuitReportBuilder, {type TestSuite} from 'junit-report-builder';
+import junitReportBuilder, {type TestSuite} from 'junit-report-builder';
 import * as maplibreglModule from '../../../dist/maplibre-gl';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -320,7 +320,7 @@ async function getImageFromStyle(styleForTest: StyleWithTestData, page: Page): P
                 gl.linkProgram(this.program);
             }
 
-            render(gl: WebGL2RenderingContext, matrix) {
+            render(gl: WebGL2RenderingContext, args) {
                 const vertexArray = new Float32Array([0.5, 0.5, 0.0]);
                 gl.useProgram(this.program);
                 const vertexBuffer = gl.createBuffer();
@@ -329,7 +329,7 @@ async function getImageFromStyle(styleForTest: StyleWithTestData, page: Page): P
                 const posAttrib = gl.getAttribLocation(this.program, 'aPos');
                 gl.enableVertexAttribArray(posAttrib);
                 gl.vertexAttribPointer(posAttrib, 3, gl.FLOAT, false, 0, 0);
-                gl.uniformMatrix4fv(gl.getUniformLocation(this.program, 'u_matrix'), false, matrix);
+                gl.uniformMatrix4fv(gl.getUniformLocation(this.program, 'u_matrix'), false, args.defaultProjectionData.mainMatrix);
                 gl.drawArrays(gl.POINTS, 0, 1);
             }
         }
@@ -412,13 +412,13 @@ async function getImageFromStyle(styleForTest: StyleWithTestData, page: Page): P
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
             }
 
-            render(gl: WebGL2RenderingContext, matrix) {
+            render(gl: WebGL2RenderingContext, args) {
                 gl.useProgram(this.program);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
                 gl.enableVertexAttribArray(this.program.a_pos);
                 gl.vertexAttribPointer(this.program.aPos, 3, gl.FLOAT, false, 0, 0);
-                gl.uniformMatrix4fv(this.program.uMatrix, false, matrix);
+                gl.uniformMatrix4fv(this.program.uMatrix, false, args.defaultProjectionData.mainMatrix);
                 gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0);
             }
         }
@@ -519,7 +519,7 @@ async function getImageFromStyle(styleForTest: StyleWithTestData, page: Page): P
                         map._render();
                         break;
                     case 'updateFakeCanvas': {
-                        const canvasSource = map.getSource(operation[1]) as CanvasSource;
+                        const canvasSource = map.getSource<CanvasSource>(operation[1]);
                         canvasSource.play();
                         // update before pause should be rendered
                         await updateFakeCanvas(window.document, testData.addFakeCanvas.id, operation[2]);
@@ -700,12 +700,12 @@ function printSpecificStatistics(status: 'passed' | 'failed' | 'errored', subset
  * @returns `true` if all the tests passed
  */
 function printStatistics(stats: TestStats): boolean {
-    const suite = jnuitReportBuilder.testSuite().name('render-tests');
+    const suite = junitReportBuilder.testSuite().name('render-tests');
     printSpecificStatistics('passed', stats.passed, stats.total, suite);
     printSpecificStatistics('failed', stats.failed, stats.total, suite);
     printSpecificStatistics('errored', stats.errored, stats.total, suite);
 
-    jnuitReportBuilder.writeTo('junit.xml');
+    junitReportBuilder.writeTo('junit.xml');
     return (stats.failed.length + stats.errored.length) === 0;
 }
 

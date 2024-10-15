@@ -1,12 +1,137 @@
 ## main
 
 ### ✨ Features and improvements
-
-- Add events to `GeolocateControl` to allow a more granular interaction ([#3847](https://github.com/maplibre/maplibre-gl-js/pull/3847))
 - _...Add new stuff here..._
 
 ### 🐞 Bug fixes
 - _...Add new stuff here..._
+
+## 5.0.0-pre.2
+
+### ✨ Features and improvements
+
+- Improve performance of `queryRenderedFeatures` by using JavaScript `Set`s to assess layer membership internally ([#4777](https://github.com/maplibre/maplibre-gl-js/pull/4777))
+
+### 🐞 Bug fixes
+
+- Fix a memory leak due to missing removal of event listener registration ([#4824](https://github.com/maplibre/maplibre-gl-js/pull/4824))
+- Improve symbol collision performance for both mercator and globe projections ([#4778](https://github.com/maplibre/maplibre-gl-js/pull/4778))
+- Fix bad line scaling near the poles under globe projection ([#4778](https://github.com/maplibre/maplibre-gl-js/pull/4778))
+- Fix globe loading many tiles at an unnecessarily high zoom level when the camera is pitched ([#4778](https://github.com/maplibre/maplibre-gl-js/pull/4778))
+
+## 5.0.0-pre.1
+
+### ✨ Features and improvements
+
+- Support globe mode ([#3963](https://github.com/maplibre/maplibre-gl-js/issues/3963))
+- Merge atmosphere an sky implementation ([#3888](https://github.com/maplibre/maplibre-gl-js/issues/3888))
+- Add option to display a realistic atmosphere when using a Globe projection ([#3888](https://github.com/maplibre/maplibre-gl-js/issues/3888))
+
+## 4.7.1
+
+### 🐞 Bug fixes
+
+- Fix circle won't render on mesa 24.1 with AMD GPU ([#4062](https://github.com/maplibre/maplibre-gl-js/issues/4062))
+- Fix hash router for urls ending with a hashtag ([#4730](https://github.com/maplibre/maplibre-gl-js/pull/4730))
+- Replace rollup-plugin-sourcemaps with rollup-plugin-sourcemaps2 ([#4740](https://github.com/maplibre/maplibre-gl-js/pull/4740))
+
+## 4.7.0
+
+### ✨ Features and improvements
+
+- Support multiple layers in `map.on`, `map.once` and `map.off` methods ([#4570](https://github.com/maplibre/maplibre-gl-js/pull/4570))
+- Ensure GeoJSON cluster sources emit a console warning if `maxzoom` is less than or equal to `clusterMaxZoom` since in this case you may see unexpected results. ([#4604](https://github.com/maplibre/maplibre-gl-js/pull/4604))
+
+### 🐞 Bug fixes
+
+- Heatmap Fix for 3D terrain ([#4571](https://github.com/maplibre/maplibre-gl-js/pull/4571))
+- Fix Map#off to not remove listener with layer(s) registered with Map#once ([#4592](https://github.com/maplibre/maplibre-gl-js/pull/4592))
+- Improve types a bit for `addSource` and `getSource` ([#4616](https://github.com/maplibre/maplibre-gl-js/pull/4616))
+- Fix the color near the horizon when terrain is enabled without any sky ([#4607](https://github.com/maplibre/maplibre-gl-js/pull/4607))
+- Fix bug where `fitBounds` and `cameraForBounds` would not display across the 180th meridian (antimeridian)
+- Fix white flickering on map resize ([#4158](https://github.com/maplibre/maplibre-gl-js/pull/4158))
+- Fixed a performance regression related to symbol placement ([#4599](https://github.com/maplibre/maplibre-gl-js/pull/4599))
+- Fix a bug where cloning a Transform instance didn't include the `lngRange`. This caused a bug where
+using `transformCameraUpdate` caused the `maxBounds` to stop working just for east/west bounds. ([#4625](https://github.com/maplibre/maplibre-gl-js/pull/4625))
+
+## 4.6.0
+
+### ✨ Features and improvements
+
+- Prefer local glyph rendering for all CJKV characters, not just those in the CJK Unified Ideographs, Hiragana, Katakana, and Hangul Syllables blocks. ([#4560](https://github.com/maplibre/maplibre-gl-js/pull/4560)))
+
+### 🐞 Bug fixes
+
+- Fix right-to-left layout of labels that contain characters in the Arabic Extended-B code block. ([#4536](https://github.com/maplibre/maplibre-gl-js/pull/4536))
+- Fix 3D map freezing when camera is adjusted against map bounds. ([#4537](https://github.com/maplibre/maplibre-gl-js/issues/4537))
+- Fix `getStyle()` to return a clone so the object cannot be internally changed ([#4488](https://github.com/maplibre/maplibre-gl-js/issues/4488))
+- Fix issues with setting sky to `undefined` ([#4587](https://github.com/maplibre/maplibre-gl-js/pull/4587)))
+
+## 4.5.2
+
+### ✨ Features and improvements
+
+- Emit events when the cooperative gestures option has prevented a gesture. ([#4470](https://github.com/maplibre/maplibre-gl-js/pull/4470))
+- Enable anisotropic filtering only when the pitch is greater than 20 degrees to preserve image sharpness on flat or slightly tilted maps.
+
+### 🐞 Bug fixes
+
+- Fix camera being able to move into 3D terrain ([#1542](https://github.com/maplibre/maplibre-gl-js/issues/1542))
+
+## 4.5.1
+
+### ✨ Features and improvements
+
+- Allow trackpad pinch gestures to break through the `cooperativeGestures` setting, bringing it in line with other embedded map behaviours, such as Google Maps and Mapbox. ([#4465](https://github.com/maplibre/maplibre-gl-js/pull/4465))
+- Expose projection matrix parameters ([#3136](https://github.com/maplibre/maplibre-gl-js/pull/3136))
+- Add option to position markers at subpixel coordinates to prevent markers jumping on `moveend` ([#4458](https://github.com/maplibre/maplibre-gl-js/pull/4458))
+
+### 🐞 Bug fixes
+
+- Fix lag on fast map zoom ([#4366](https://github.com/maplibre/maplibre-gl-js/pull/4366))
+- Fix unguarded read access to possibly undefined object ([#4431](https://github.com/maplibre/maplibre-gl-js/pull/4431))
+- Fix remove hash string when map is removed ([#4427](https://github.com/maplibre/maplibre-gl-js/pull/4427))
+- Fix GeolocateControl may be added twice when calling addControl/removeControl/addControl rapidly ([#4454](https://github.com/maplibre/maplibre-gl-js/pull/4454))
+- Fix `style.loadURL` abort error being logged when removing style ([#4425](https://github.com/maplibre/maplibre-gl-js/pull/4425))
+- Fix vector tiles not loading when html is opened via "resource://android" (i.e., the assets folder) in GeckoView on Android ([#4451](https://github.com/maplibre/maplibre-gl-js/pull/4451))
+
+## 4.5.0
+
+### ✨ Features and improvements
+
+- Add sky implementation according to spec ([#3645](https://github.com/maplibre/maplibre-gl-js/pull/3645))
+
+### 🐞 Bug fixes
+
+- Fix (de)serialization of extends of built-ins (currently only AjaxError) not working correctly in web_worker_transfer. Also refactored related web_worker_transfer code and added more tests ([#4024](https://github.com/maplibre/maplibre-gl-js/pull/4211))
+
+## 4.4.1
+
+### 🐞 Bug fixes
+
+- Fix `terrain` listener memory leak when adding and removing Marker ([#4284](https://github.com/maplibre/maplibre-gl-js/pull/4284))
+
+## 4.4.0
+
+### ✨ Features and improvements
+
+- Improve animation curve when easeTo and flyTo with constraints ([#3793](https://github.com/maplibre/maplibre-gl-js/pull/3793))
+- For filled extrusions, calculate the elevation per polygon ([#3313](https://github.com/maplibre/maplibre-gl-js/issues/3313))
+- Add events to `GeolocateControl` to allow a more granular interaction ([#3847](https://github.com/maplibre/maplibre-gl-js/pull/3847))
+- Make `MapOptions.style` optional to be consistent with `Map.setStyle(null)` ([#4151](https://github.com/maplibre/maplibre-gl-js/pull/4151))
+- Use Autoprefixer to handle vendor prefixes in CSS ([#4165](https://github.com/maplibre/maplibre-gl-js/pull/4165))
+- Make `aria-label` configurable for Map, Marker and Popup ([#4147](https://github.com/maplibre/maplibre-gl-js/pull/4147))
+- Map `<canvas>` is focusable only when interactive ([#4147](https://github.com/maplibre/maplibre-gl-js/pull/4147))
+- "Accept" headers set in Request Transformers are not overwritten ([#4210](https://github.com/maplibre/maplibre-gl-js/pull/4210))
+- ⚠️ Rename projMatrix to modelViewProjectionMatrix. Also rename invProjMatrix, alignedProjMatrix accordingly ([#4215](https://github.com/maplibre/maplibre-gl-js/pull/4215))
+- Publish an unminified prod build ([#4265](https://github.com/maplibre/maplibre-gl-js/pull/4265))
+
+### 🐞 Bug fixes
+
+- ⚠️ Allow breaking lines in labels before a left parenthesis ([#4138](https://github.com/maplibre/maplibre-gl-js/pull/4138))
+- ⚠️ Fix ignoring embedded line breaks when `symbol-placement` is `line` or `line-center` ([#4124](https://github.com/maplibre/maplibre-gl-js/pull/4124))
+- Ensure loseContext exists before calling it ([#4245](https://github.com/maplibre/maplibre-gl-js/pull/4245))
+- Update deprecated `-ms-high-contrast` vendor prefix to `(forced-colors: active)` and `(prefers-color-scheme: light)` as appropriate ([#4250](https://github.com/maplibre/maplibre-gl-js/pull/4250))
 
 ## 4.3.2
 
@@ -138,9 +263,9 @@
 - ⚠️ Moved the `addSourceType` to be a part of the global maplibregl object instead of being per map object ([#3420](https://github.com/maplibre/maplibre-gl-js/pull/3420))
 - ⚠️ Removed callback usage from `map.loadImage` in continue to below change ([#3422](https://github.com/maplibre/maplibre-gl-js/pull/3422))
 - ⚠️ Changed the `GeoJSONSource`'s `getClusterExpansionZoom`, `getClusterChildren`, `getClusterLeaves` methods to return a `Promise` instead of a callback usage ([#3421](https://github.com/maplibre/maplibre-gl-js/pull/3421))
-- ⚠️ Changed the `setRTLTextPlugin` function to return a promise instead of using callback ([#3418](https://github.com/maplibre/maplibre-gl-js/pull/3418)) this also changed how the RTL pluing code is handled internally by splitting the main thread and worker thread code.
+- ⚠️ Changed the `setRTLTextPlugin` function to return a promise instead of using callback ([#3418](https://github.com/maplibre/maplibre-gl-js/pull/3418)) this also changed how the RTL plugin code is handled internally by splitting the main thread and worker thread code.
 - ⚠️ Remove `setCooperativeGestures` and `getCooperativeGestures` functions in favor of `cooperativeGestures` handler which now has an `enabled()` or `disabled()` methods ([#3430](https://github.com/maplibre/maplibre-gl-js/pull/3430))
-- ⚠️ Changed the undeling worker communication from callbacks to promises. This has a breaking effect on the implementation of custom `WorkerSource` and how it behaves ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
+- ⚠️ Changed the underlying worker communication from callbacks to promises. This has a breaking effect on the implementation of custom `WorkerSource` and how it behaves ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed the `Source` interface to return promises instead of callbacks ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed all the sources to be promises based. ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed the `map.loadImage` method to return a `Promise` instead of a callback usage ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
@@ -149,12 +274,12 @@
 - Changed `ImageRequest` to be `Promise` based ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - Improved precision and added a subtle fade transition to marker opacity changes ([#3431](https://github.com/maplibre/maplibre-gl-js/pull/3431))
 - Adds support for terrain in `setStyle` with diff method ([#3515](https://github.com/maplibre/maplibre-gl-js/pull/3515), [#3463](https://github.com/maplibre/maplibre-gl-js/pull/3463))
-- Upgraded to use Node JS 20 and removed the dependency of `gl` package from the tests to allow easier develpment setup. ([#3452](https://github.com/maplibre/maplibre-gl-js/pull/3452))
+- Upgraded to use Node JS 20 and removed the dependency of `gl` package from the tests to allow easier development setup. ([#3452](https://github.com/maplibre/maplibre-gl-js/pull/3452))
 
 ### 🐞 Bug fixes
 
 - Fix wheel zoom to be into the same direction above or under the horizon ([#3398](https://github.com/maplibre/maplibre-gl-js/issues/3398))
-- Fix \_cameraForBoxAndBearing not fitting bounds properly when using asymettrical camera viewport and bearing.([#3591](https://github.com/maplibre/maplibre-gl-js/pull/3591))
+- Fix \_cameraForBoxAndBearing not fitting bounds properly when using asymmetrical camera viewport and bearing.([#3591](https://github.com/maplibre/maplibre-gl-js/pull/3591))
 - Fix missing export `Map` type in the `d.ts` file ([#3564](https://github.com/maplibre/maplibre-gl-js/pull/3564))
 - Fix the shifted mouse events after a css transform scale on the map container ([#3437](https://github.com/maplibre/maplibre-gl-js/pull/3437))
 - Fix markers remaining transparent when disabling terrain ([#3431](https://github.com/maplibre/maplibre-gl-js/pull/3431))
@@ -189,7 +314,7 @@
 ### 🐞 Bug fixes
 
 - Fix wheel zoom to be into the same direction above or under the horizon ([#3398](https://github.com/maplibre/maplibre-gl-js/issues/3398))
-- Fix \_cameraForBoxAndBearing not fitting bounds properly when using asymettrical camera viewport and bearing ([#3591](https://github.com/maplibre/maplibre-gl-js/pull/3591))
+- Fix \_cameraForBoxAndBearing not fitting bounds properly when using asymmetrical camera viewport and bearing ([#3591](https://github.com/maplibre/maplibre-gl-js/pull/3591))
 
 ## 4.0.0-pre.4
 
@@ -202,7 +327,7 @@
 ### ✨ Features and improvements
 
 - ⚠️ Add the ability to import a script in the worker thread and call `addProtocol` and `removeProtocol` there ([#3459](https://github.com/maplibre/maplibre-gl-js/pull/3459)) - this also changed how `addSourceType` works since now you'll need to load the script with `maplibregl.importScriptInWorkers`.
-- Upgraded to use Node JS 20 and removed the dependency of `gl` package from the tests to allow easier develpment setup. ([#3452](https://github.com/maplibre/maplibre-gl-js/pull/3452))
+- Upgraded to use Node JS 20 and removed the dependency of `gl` package from the tests to allow easier development setup. ([#3452](https://github.com/maplibre/maplibre-gl-js/pull/3452))
 - Improved precision and added a subtle fade transition to marker opacity changes ([#3431](https://github.com/maplibre/maplibre-gl-js/pull/3431))
 - Adds support for terrain in `setStyle` with diff method ([#3515](https://github.com/maplibre/maplibre-gl-js/pull/3515), [#3463](https://github.com/maplibre/maplibre-gl-js/pull/3463))
 
@@ -220,7 +345,7 @@
 - ⚠️ Moved the `addSourceType` to be a part of the global maplibregl object instead of being per map object ([#3420](https://github.com/maplibre/maplibre-gl-js/pull/3420))
 - ⚠️ Removed callback usage from `map.loadImage` in continue to below change ([#3422](https://github.com/maplibre/maplibre-gl-js/pull/3422))
 - ⚠️ Changed the `GeoJSONSource`'s `getClusterExpansionZoom`, `getClusterChildren`, `getClusterLeaves` methods to return a `Promise` instead of a callback usage ([#3421](https://github.com/maplibre/maplibre-gl-js/pull/3421))
-- ⚠️ Changed the `setRTLTextPlugin` function to return a promise instead of using callback ([#3418](https://github.com/maplibre/maplibre-gl-js/pull/3418)) this also changed how the RTL pluing code is handled internally by splitting the main thread and worker thread code.
+- ⚠️ Changed the `setRTLTextPlugin` function to return a promise instead of using callback ([#3418](https://github.com/maplibre/maplibre-gl-js/pull/3418)) this also changed how the RTL plugin code is handled internally by splitting the main thread and worker thread code.
 - ⚠️ Remove `setCooperativeGestures` and `getCooperativeGestures` functions in favor of `cooperativeGestures` handler which now has an `enabled()` or `disabled()` methods ([#3430](https://github.com/maplibre/maplibre-gl-js/pull/3430))
 - Created a new example showing how to place a threejs scene as a `CustomLayer` over maplibre 3d-terrain ([#3429](https://github.com/maplibre/maplibre-gl-js/pull/3429))
 
@@ -236,7 +361,7 @@
 ### ✨ Features and improvements
 
 - Changed `ImageRequest` to be `Promise` based ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
-- ⚠️ Changed the undeling worker communication from callbacks to promises. This has a breaking effect on the implementation of custom `WorkerSource` and how it behaves ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
+- ⚠️ Changed the underlying worker communication from callbacks to promises. This has a breaking effect on the implementation of custom `WorkerSource` and how it behaves ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed the `Source` interface to return promises instead of callbacks ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed all the sources to be promises based. ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
 - ⚠️ Changed the `map.loadImage` method to return a `Promise` instead of a callback usage ([#3233](https://github.com/maplibre/maplibre-gl-js/pull/3233))
@@ -380,7 +505,7 @@
 - Immediately redraw the map after setting pixel ratio ([#2674](https://github.com/maplibre/maplibre-gl-js/pull/2673))
 - Add maxCanvasSize option to limit canvas size. It can prevent reaching the GL limits and reduce the load on the devices. Default value is [4096, 4096].
 - Reduce maxCanvasSize when hitting GL limits to avoid distortions ([#2674](https://github.com/maplibre/maplibre-gl-js/pull/2673))
-- Rewrite all the code comments in TSDocs, introduced a new documentaiton system and moved examples into this repository for better debug options ([#2756](https://github.com/maplibre/maplibre-gl-js/pull/2756))
+- Rewrite all the code comments in TSDocs, introduced a new documentation system and moved examples into this repository for better debug options ([#2756](https://github.com/maplibre/maplibre-gl-js/pull/2756))
 - ⚠️ Removed non documented `Marker` constructor parameter ([#2756](https://github.com/maplibre/maplibre-gl-js/pull/2756))
 - Updated `check-for-support` example ([#2859](https://github.com/maplibre/maplibre-gl-js/pull/2859))
 
@@ -400,7 +525,7 @@
 
 ### 🐞 Bug fixes
 
-- Fix regression - Add webgl1 fallback to accomondate users without webgl2 support ([#2653](https://github.com/maplibre/maplibre-gl-js/issues/2653))
+- Fix regression - Add webgl1 fallback to accommodate users without webgl2 support ([#2653](https://github.com/maplibre/maplibre-gl-js/issues/2653))
 
 ## 3.0.1
 
@@ -728,7 +853,7 @@ Everything from the four previous pre-releases:
 - Handle maxBounds which cross the meridian at longitude ±180° ([#1298](https://github.com/maplibre/maplibre-gl-js/pull/1298), [#1299](https://github.com/maplibre/maplibre-gl-js/pull/1299))
 - Hide arrow displayed in default `summary` styles on the attribution control ([#1258](https://github.com/maplibre/maplibre-gl-js/pull/1258))
 - Fix memory usage in terrain 3D ([#1291](https://github.com/maplibre/maplibre-gl-js/issues/1291), [#1302](https://github.com/maplibre/maplibre-gl-js/pull/1302))
-- Fix disappearence of closest tiles when 3D terrain is enabled ([#1241](https://github.com/maplibre/maplibre-gl-js/issues/1241), [#1300](https://github.com/maplibre/maplibre-gl-js/pull/1300))
+- Fix disappearance of closest tiles when 3D terrain is enabled ([#1241](https://github.com/maplibre/maplibre-gl-js/issues/1241), [#1300](https://github.com/maplibre/maplibre-gl-js/pull/1300))
 
 ## 2.2.0-pre.4
 
@@ -749,7 +874,7 @@ Everything from the four previous pre-releases:
 - Handle maxBounds which cross the meridian at longitude ±180° ([#1298](https://github.com/maplibre/maplibre-gl-js/issues/1298), [#1299](https://github.com/maplibre/maplibre-gl-js/pull/1299))
 - Hide arrow displayed in default `summary` styles on the attribution control ([#1258](https://github.com/maplibre/maplibre-gl-js/pull/1258))
 - Fix memory usage in terrain 3D ([#1291](https://github.com/maplibre/maplibre-gl-js/issues/1291), [#1302](https://github.com/maplibre/maplibre-gl-js/pull/1302))
-- Fix disappearence of closest tiles when 3D terrain is enabled ([#1241](https://github.com/maplibre/maplibre-gl-js/issues/1241), [#1300](https://github.com/maplibre/maplibre-gl-js/pull/1300))
+- Fix disappearance of closest tiles when 3D terrain is enabled ([#1241](https://github.com/maplibre/maplibre-gl-js/issues/1241), [#1300](https://github.com/maplibre/maplibre-gl-js/pull/1300))
 
 ## 2.2.0-pre.2
 
@@ -862,7 +987,7 @@ Everything from the four previous pre-releases:
 
 ### Features and improvements
 
-- Default compact attribution to be open by default to comply with OpenSteetMap Attribution Guidelines ([#795](https://github.com/maplibre/maplibre-gl-js/pull/795))
+- Default compact attribution to be open by default to comply with OpenStreetMap Attribution Guidelines ([#795](https://github.com/maplibre/maplibre-gl-js/pull/795))
 - Export `Source` classes (`GeoJSONSource` etc.) declarations. ([#801](https://github.com/maplibre/maplibre-gl-js/issues/801))
 - Make `AJAXError` public so error HTTP responses can be handled differently from other errors.
 
@@ -1282,7 +1407,7 @@ This patch introduces two workarounds that address longstanding issues related t
 ### 🍏 Improvements
 
 - Implement workaround for memory leak in Safari when using the `CacheStorage` API. ([#8856](https://github.com/mapbox/mapbox-gl-js/pull/8956))
-- Implement workaround for memory leak in Safari when using `Transferable` objects to transfer `ArrayBuffers` to WebWorkers. If GL-JS detetcts that it is running in Safari, the use of `Transferables` to transfer data to WebWorkers is disabled. ([#9003](https://github.com/mapbox/mapbox-gl-js/pull/9003))
+- Implement workaround for memory leak in Safari when using `Transferable` objects to transfer `ArrayBuffers` to WebWorkers. If GL-JS detects that it is running in Safari, the use of `Transferables` to transfer data to WebWorkers is disabled. ([#9003](https://github.com/mapbox/mapbox-gl-js/pull/9003))
 - Improve animation performance when using `map.setData`. ([#8913](https://github.com/mapbox/mapbox-gl-js/pull/8913)) (h/t [msbarry](https://github.com/msbarry))
 
 ## 1.5.0
@@ -2049,8 +2174,8 @@ August 16, 2018
 - Use setData operation when diffing geojson sources [#5332](https://github.com/mapbox/mapbox-gl-js/pull/5332)
 - Return early from draw calls on layers where opacity=0 [#5429](https://github.com/mapbox/mapbox-gl-js/pull/5429)
 - A [heatmap](https://www.mapbox.com/mapbox-gl-js/example/heatmap-layer/) layer type is now available. This layer type allows you to visualize and explore massive datasets of points, reflecting the shape and density of data well while also looking beautiful. See [the blog post](https://blog.mapbox.com/sneak-peek-at-heatmaps-in-mapbox-gl-73b41d4b16ae) for further details.
-  ![](https://cdn-images-1.medium.com/max/1600/1*Dme5MAgdA3pYdTRHUQzvLw.png)
-- The value of a style property or filter can now be an [expression](http://www.mapbox.com/mapbox-gl-js/style-spec/#expressions). Expressions are a way of doing data-driven and zoom-driven styling that provides more flexibility and control, and unifies property and filter syntax.
+  ![heatmap screenshot](https://cdn-images-1.medium.com/max/1600/1*Dme5MAgdA3pYdTRHUQzvLw.png)
+- The value of a style property or filter can now be an [expression](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions). Expressions are a way of doing data-driven and zoom-driven styling that provides more flexibility and control, and unifies property and filter syntax.
 
   Previously, data-driven and zoom-driven styling relied on stop functions: you specify a feature property and a set of input-output pairs that essentially define a “scale” for how the style should be calculated based on the feature property. For example, the following would set circle colors on a green-to-red scale based on the value of `feature.properties.population`:
 
@@ -2081,7 +2206,7 @@ August 16, 2018
   **Filters**
   Style layer filters had similar limitations. Moreover, they use a different syntax, even though their job is very similar to that of data-driven styling functions: filters say, “here’s how to look at a feature and decide whether to draw it,” and data-driven style functions say, “here’s how to look at a feature and decide how to size/color/place it.” Expressions provide a unified syntax for defining parts of a style that need to be calculated dynamically from feature data.
 
-  For information on the syntax and behavior of expressions, please see [the documentation](http://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
+  For information on the syntax and behavior of expressions, please see [the documentation](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
 
 ### :wrench: Development workflow improvements
 
@@ -2659,7 +2784,7 @@ August 16, 2018
 
 - Add support for `line-color` property functions [#2938](https://github.com/mapbox/mapbox-gl-js/pull/2938)
 - Add `Scale` control [#2940](https://github.com/mapbox/mapbox-gl-js/pull/2940) [#3042](https://github.com/mapbox/mapbox-gl-js/pull/3042)
-- Improve polygon label placement by rendering labels at the pole of inaccessability [#3038](https://github.com/mapbox/mapbox-gl-js/pull/3038)
+- Improve polygon label placement by rendering labels at the pole of inaccessibility [#3038](https://github.com/mapbox/mapbox-gl-js/pull/3038)
 - Add `Popup` `offset` option [#1962](https://github.com/mapbox/mapbox-gl-js/issues/1962)
 - Add `Marker#bindPopup` method [#3056](https://github.com/mapbox/mapbox-gl-js/pull/3056)
 
@@ -3027,7 +3152,7 @@ August 16, 2018
 
 - Fixed `Popup#addTo` when the popup is already open ([#1811](https://github.com/mapbox/mapbox-gl-js/issues/1811))
 - Fixed warping when rotating / zooming really fast
-- `Map#flyTo` now flies across the antimeridan if shorter ([#1853](https://github.com/mapbox/mapbox-gl-js/issues/1853))
+- `Map#flyTo` now flies across the antimeridian if shorter ([#1853](https://github.com/mapbox/mapbox-gl-js/issues/1853))
 
 ## 0.12.1 (Dec 8 2015)
 
