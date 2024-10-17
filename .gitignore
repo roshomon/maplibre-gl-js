@@ -40,3 +40,4 @@ npm-debug.log
 /.vs/
 .*.swp
 junit.xml
+pnpm-lock.yaml
