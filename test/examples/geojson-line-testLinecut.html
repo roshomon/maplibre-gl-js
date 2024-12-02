@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Add a GeoJSON line</title>
+    <meta property="og:description"
+        content="Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties." />
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='../../dist/maplibre-gl.css' />
+    <script src='../../dist/maplibre-gl-dev.js'></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            // "glyphs": "./glyphs/{fontstack}/{range}.pbf",
+            // "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+
+            // localIdeographFontFamily: '"Apple LiSung", serif',
+            style: {
+                "glyphs": "./glyphs/{fontstack}/{range}.pbf",
+                'version': 8,
+                'sources': {
+                    'raster-tiles': {
+                        'type': 'raster',
+                        'tiles': [
+                            // NOTE: Layers from Stadia Maps do not require an API key for localhost development or most production
+                            // web deployments. See https://docs.stadiamaps.com/authentication/ for details.
+                            "https://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
+                        ],
+                        // 'tileSize': 256,
+                    },
+                    'testLine': {
+                        'type': 'geojson',
+                        'data': './data/testLine.json'
+                    },
+                },
+                'layers': [{
+                    'id': 'simple-tiles',
+                    'type': 'raster',
+                    'source': 'raster-tiles',
+                    'minzoom': 0,
+                    'maxzoom': 22
+                }, {
+                    'id': 'testLineCut',
+                    'type': 'line',
+                    'source': 'testLine',
+                    'minzoom': 0,
+                    'maxzoom': 16,
+                    'paint': {
+                        'line-color': 'grey',
+                        'line-width': 2,
+                    }
+                }, {
+                    'id': 'testLineCut1',
+                    'type': 'line',
+                    'source': 'testLine',
+                    'minzoom': 0,
+                    'maxzoom': 16,
+                    'paint': {
+                        'line-color': 'red',
+                        'line-width': 2,
+                        'line-offset': 10,
+                        'line-translate': [0, -100],
+                    }
+                }]
+            },
+            // style:
+            //     'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+            center: [115.484, 32.247],
+            zoom: 5
+        })
+
+        map.on('mousemove', 'acline_1000kV', function (e) {
+            if (e.features.length > 0) {
+                if (e.features[0].id) {
+                    const state = map.getFeatureState({
+                        source: 'acline_1000kV',
+                        // sourceLayer: 'my-source-layer',
+                        id: e.features[0].id
+                    })
+                    console.log(state);
+                }
+
+
+            }
+        });
+
+
+        map.on('load', async () => {
+            const image = await map.loadImage('./img/1001.png');
+            map.addImage('1001', image.data);
+        });
+    </script>
+</body>
+
+</html>
