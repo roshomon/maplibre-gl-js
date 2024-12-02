@@ -3,9 +3,9 @@ import UnitBezier from '@mapbox/unitbezier';
 import {isOffscreenCanvasDistorted} from './offscreen_canvas_distorted';
 import type {Size} from './image';
 import type {WorkerGlobalScopeInterface} from './web_worker';
-import {mat3, mat4, quat, vec3, vec4} from 'gl-matrix';
+import {mat3, mat4, quat, vec2, type vec3, type vec4} from 'gl-matrix';
 import {pixelsToTileUnits} from '../source/pixels_to_tile_units';
-import {OverscaledTileID} from '../source/tile_id';
+import {type OverscaledTileID} from '../source/tile_id';
 
 /**
  * Returns a new 64 bit float vec4 of zeroes.
@@ -20,10 +20,22 @@ export function createVec3f64(): vec3 { return new Float64Array(3) as any; }
  */
 export function createMat4f64(): mat4 { return new Float64Array(16) as any; }
 /**
+ * Returns a new 32 bit float mat4 of zeroes.
+ */
+export function createMat4f32(): mat4 { return new Float32Array(16) as any; }
+/**
  * Returns a new 64 bit float mat4 set to identity.
  */
 export function createIdentityMat4f64(): mat4 {
     const m = new Float64Array(16) as any;
+    mat4.identity(m);
+    return m;
+}
+/**
+ * Returns a new 32 bit float mat4 set to identity.
+ */
+export function createIdentityMat4f32(): mat4 {
+    const m = new Float32Array(16) as any;
     mat4.identity(m);
     return m;
 }
@@ -845,7 +857,13 @@ export async function getImageData(
     return readImageDataUsingOffscreenCanvas(image, x, y, width, height);
 }
 
+/**
+ * Allows to unsubscribe from events without the need to store the method reference.
+ */
 export interface Subscription {
+    /**
+     * Unsubscribes from the event.
+     */
     unsubscribe(): void;
 }
 
@@ -921,6 +939,15 @@ export function getRollPitchBearing(rotation: quat): RollPitchBearing {
     return {roll, pitch: xAngle + 90.0, bearing};
 }
 
+export function getAngleDelta(lastPoint: Point, currentPoint: Point, center: Point): number {
+    const pointVect = vec2.fromValues(currentPoint.x - center.x, currentPoint.y - center.y);
+    const lastPointVec = vec2.fromValues(lastPoint.x - center.x, lastPoint.y - center.y);
+
+    const crossProduct = pointVect[0] * lastPointVec[1] - pointVect[1] * lastPointVec[0];
+    const angleRadians = Math.atan2(crossProduct, vec2.dot(pointVect, lastPointVec));
+    return radiansToDegrees(angleRadians);
+}
+
 /**
  * This method converts roll, pitch, and bearing angles in degrees to a rotation quaternion.
  * @param roll - Roll angle in degrees
@@ -958,6 +985,11 @@ export function rollPitchBearingToQuat(roll: number, pitch: number, bearing: num
 export type Complete<T> = {
     [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 }
+
+/**
+ * A helper to allow require of at least one property
+ */
+export type RequireAtLeastOne<T> = { [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>>; }[keyof T];
 
 export type TileJSON = {
     tilejson: '2.2.0' | '2.1.0' | '2.0.1' | '2.0.0' | '1.0.0';

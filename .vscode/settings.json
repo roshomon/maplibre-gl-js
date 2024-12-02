@@ -14,7 +14,12 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+<<<<<<< HEAD
   },
   "jest.jestCommandLine": "jest",
   "liveServer.settings.port": 5501,
 }
+=======
+  }
+}
+>>>>>>> 30ab703678718ab230786ba55b6223f575769c0c
