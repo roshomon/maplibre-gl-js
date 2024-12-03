@@ -75,8 +75,7 @@
                     'paint': {
                         'line-color': 'red',
                         'line-width': 2,
-                        'line-offset': 10,
-                        'line-translate': [0, -100],
+                        'line-dasharray': [0, 20, 187.55555, 20],// 通过map.project()得到的屏幕坐标计算线长，然后array=[显示长度, 截取长度,显示长度,截取长度.....] ***这里的值都需要是实际值/线宽***
                     }
                 }]
             },
