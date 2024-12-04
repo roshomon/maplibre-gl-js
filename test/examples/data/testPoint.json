@@ -1,0 +1,31 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "device1"
+            },
+            "geometry": {
+                "coordinates": [
+                    110,
+                    35
+                ],
+                "type": "Point"
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "device2"
+            },
+            "geometry": {
+                "coordinates": [
+                    120,
+                    35
+                ],
+                "type": "Point"
+            }
+        }
+    ]
+}

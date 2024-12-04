@@ -49,35 +49,61 @@
                         'type': 'geojson',
                         'data': './data/testLine.json'
                     },
+                    'testPoint': {
+                        'type': 'geojson',
+                        'data': './data/testPoint.json'
+                    },
                 },
-                'layers': [{
-                    'id': 'simple-tiles',
-                    'type': 'raster',
-                    'source': 'raster-tiles',
-                    'minzoom': 0,
-                    'maxzoom': 22
-                }, {
-                    'id': 'testLineCut',
-                    'type': 'line',
-                    'source': 'testLine',
-                    'minzoom': 0,
-                    'maxzoom': 16,
-                    'paint': {
-                        'line-color': 'grey',
-                        'line-width': 2,
-                    }
-                }, {
-                    'id': 'testLineCut1',
-                    'type': 'line',
-                    'source': 'testLine',
-                    'minzoom': 0,
-                    'maxzoom': 16,
-                    'paint': {
-                        'line-color': 'red',
-                        'line-width': 2,
-                        'line-dasharray': [0, 20, 187.55555, 20],// 通过map.project()得到的屏幕坐标计算线长，然后array=[显示长度, 截取长度,显示长度,截取长度.....] ***这里的值都需要是实际值/线宽***
-                    }
-                }]
+                'layers': [
+                    //     {
+                    //     'id': 'simple-tiles',
+                    //     'type': 'raster',
+                    //     'source': 'raster-tiles',
+                    //     'minzoom': 0,
+                    //     'maxzoom': 22
+                    // }
+                    // , 
+                    {
+                        'id': 'testLineCut',
+                        'type': 'line',
+                        'source': 'testLine',
+                        'minzoom': 0,
+                        'maxzoom': 16,
+                        'paint': {
+                            'line-color': 'green',
+                            'line-width': 5,
+                        }
+                    },
+                    // {
+                    //     'id': 'testLineCut1',
+                    //     'type': 'line',
+                    //     'source': 'testLine',
+                    //     'minzoom': 0,
+                    //     'maxzoom': 16,
+                    //     'paint': {
+                    //         'line-color': 'red',
+                    //         'line-width': 2,
+                    //         'line-dasharray': [0, 20, 187.55555, 20],// 通过map.project()得到的屏幕坐标计算线长，然后array=[显示长度, 截取长度,显示长度,截取长度.....] ***这里的值都需要是实际值/线宽***
+                    //     }
+                    // },
+                    {
+                        'id': 'points',
+                        'type': 'symbol',
+                        'source': 'testPoint',
+                        'layout': {
+                            'icon-image': 'device',
+                            'icon-allow-overlap': true,
+                            'icon-size': 0.2,
+                            // get the year from the source's "year" property
+                            'text-field': ['get', 'name'],
+                            'text-allow-overlap': true,
+                            'text-font': [
+                                'NotoCJK'
+                            ],
+                            'text-offset': [0, 1.25],
+                            'text-anchor': 'top'
+                        }
+                    }]
             },
             // style:
             //     'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
@@ -85,25 +111,9 @@
             zoom: 5
         })
 
-        map.on('mousemove', 'acline_1000kV', function (e) {
-            if (e.features.length > 0) {
-                if (e.features[0].id) {
-                    const state = map.getFeatureState({
-                        source: 'acline_1000kV',
-                        // sourceLayer: 'my-source-layer',
-                        id: e.features[0].id
-                    })
-                    console.log(state);
-                }
-
-
-            }
-        });
-
-
         map.on('load', async () => {
-            const image = await map.loadImage('./img/1001.png');
-            map.addImage('1001', image.data);
+            const image = await map.loadImage('./img/device.png');
+            map.addImage('device', image.data);
         });
     </script>
 </body>
