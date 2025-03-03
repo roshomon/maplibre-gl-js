@@ -1,9 +1,8 @@
 import {vec3} from 'gl-matrix';
-import {clamp, lerp, mod, remapSaturate, wrap} from '../../util/util';
+import {clamp, lerp, MAX_VALID_LATITUDE, mod, remapSaturate, scaleZoom, wrap} from '../../util/util';
 import {LngLat} from '../lng_lat';
-import {MAX_VALID_LATITUDE, scaleZoom} from '../transform_helper';
-import type Point from '@mapbox/point-geometry';
 import {EXTENT} from '../../data/extent';
+import type Point from '@mapbox/point-geometry';
 
 export function getGlobeCircumferencePixels(transform: {worldSize: number; center: {lat: number}}): number {
     const radius = getGlobeRadiusPixels(transform.worldSize, transform.center.lat);
@@ -53,7 +52,7 @@ export function angularCoordinatesRadiansToVector(lngRadians: number, latRadians
  * @returns A 3D vector - coordinates of the projected point on a unit sphere.
  */
 export function projectTileCoordinatesToSphere(inTileX: number, inTileY: number, tileIdX: number, tileIdY: number, tileIdZ: number): vec3 {
-    // This code could be assembled from 3 fuctions, but this is a hot path for symbol placement,
+    // This code could be assembled from 3 functions, but this is a hot path for symbol placement,
     // so for optimization purposes everything is inlined by hand.
     //
     // Non-inlined variant of this function would be this:
